@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SpoilerBlock Test Page</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            line-height: 1.6;
+            background: #fafafa;
+        }
+        .instagram-mockup {
+            background: white;
+            border: 1px solid #dbdbdb;
+            border-radius: 8px;
+            margin: 20px 0;
+            padding: 20px;
+        }
+        .comment {
+            border-bottom: 1px solid #efefef;
+            padding: 15px 0;
+            margin-bottom: 10px;
+        }
+        .username {
+            font-weight: bold;
+            margin-right: 8px;
+        }
+        .test-info {
+            background: #e3f2fd;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 20px 0;
+        }
+        .test-info h3 {
+            margin-top: 0;
+            color: #1976d2;
+        }
+    </style>
+</head>
+<body>
+    <h1>🚫 SpoilerBlock Extension Test Page</h1>
+    
+    <div class="test-info">
+        <h3>How to Test:</h3>
+        <ol>
+            <li>Install the SpoilerBlock extension</li>
+            <li>Add movies like "Avengers: Endgame", "Star Wars", "Game of Thrones" to your watchlist</li>
+            <li>The comments below should be automatically censored if they contain spoilers</li>
+            <li>Click "Click to reveal" to see the original content</li>
+        </ol>
+    </div>
+
+    <div class="instagram-mockup">
+        <h2>Mock Instagram Comments</h2>
+        
+        <div class="comment">
+            <span class="username">movie_lover_23</span>
+            <span>Just watched Avengers: Endgame and I can't believe Tony Stark dies! That ending was so emotional 😭</span>
+        </div>
+        
+        <div class="comment">
+            <span class="username">got_fan_4ever</span>
+            <span>No spoilers here! Just want to say Game of Thrones is an amazing show. Can't wait for the new season!</span>
+        </div>
+        
+        <div class="comment">
+            <span class="username">star_wars_nerd</span>
+            <span>SPOILER ALERT: Luke Skywalker is Darth Vader's son! Mind blown 🤯</span>
+        </div>
+        
+        <div class="comment">
+            <span class="username">casual_viewer</span>
+            <span>Great movie! Really enjoyed watching it with friends. Highly recommend!</span>
+        </div>
+        
+        <div class="comment">
+            <span class="username">series_addict</span>
+            <span>Season 8 episode 3 of Game of Thrones was insane! The Night King finally gets defeated by Arya Stark!</span>
+        </div>
+        
+        <div class="comment">
+            <span class="username">marvel_expert</span>
+            <span>The plot twist in Avengers: Endgame where they use time travel to reverse the snap was brilliant storytelling!</span>
+        </div>
+        
+        <div class="comment">
+            <span class="username">movie_critic</span>
+            <span>Don't read if you haven't seen Star Wars Episode V: The Empire Strikes Back - but that reveal about Luke's father changed everything!</span>
+        </div>
+
+        <div class="comment">
+            <span class="username">binge_watcher</span>
+            <span>Just finished watching the entire Lord of the Rings trilogy. What an epic journey!</span>
+        </div>
+    </div>
+
+    <div class="test-info">
+        <h3>Expected Behavior:</h3>
+        <ul>
+            <li><strong>Should be censored:</strong> Comments mentioning deaths, plot twists, specific episode details, and explicit spoiler warnings</li>
+            <li><strong>Should NOT be censored:</strong> General positive comments without specific plot details</li>
+            <li><strong>Sensitivity settings:</strong> Higher sensitivity should catch more potential spoilers</li>
+        </ul>
+    </div>
+
+    <script>
+        // Simple script to simulate Instagram-like content loading
+        console.log('Test page loaded - SpoilerBlock should process these comments');
+        
+        // Add some dynamic content after a delay to test real-time detection
+        setTimeout(() => {
+            const newComment = document.createElement('div');
+            newComment.className = 'comment';
+            newComment.innerHTML = '<span class="username">late_commenter</span><span>Just added this comment dynamically! Spoiler: Harry Potter defeats Voldemort in the final book!</span>';
+            
+            document.querySelector('.instagram-mockup').appendChild(newComment);
+            console.log('Added dynamic comment for real-time testing');
+        }, 3000);
+    </script>
+</body>
+</html>

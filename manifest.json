@@ -1,0 +1,43 @@
+{
+  "manifest_version": 3,
+  "name": "Spoiler Block",
+  "version": "1.0.0",
+  "description": "AI-powered browser extension that detects and censors spoilers in Instagram comments and posts",
+  
+  "permissions": [
+    "storage",
+    "activeTab"
+  ],
+  
+  "host_permissions": [
+    "https://*.instagram.com/*"
+  ],
+  
+  "content_scripts": [
+    {
+      "matches": ["https://*.instagram.com/*"],
+      "js": ["content.js"],
+      "css": ["content.css"],
+      "run_at": "document_idle"
+    }
+  ],
+  
+  "action": {
+    "default_popup": "popup.html",
+    "default_title": "Spoiler Block Settings"
+  },
+  
+  "icons": {
+    "16": "icons/icon16.png",
+    "32": "icons/icon32.png",
+    "48": "icons/icon48.png",
+    "128": "icons/icon128.png"
+  },
+  
+  "web_accessible_resources": [
+    {
+      "resources": ["icons/*"],
+      "matches": ["https://*.instagram.com/*"]
+    }
+  ]
+}
