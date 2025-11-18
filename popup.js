@@ -14,34 +14,33 @@ class SpoilerBlockPopup {
         this.updateUI();
     }
 
-
     async loadSettings() {
         try {
             const data = await chrome.storage.sync.get(['monitoredMovies', 'isEnabled', 'sensitivity']);
-
             this.monitoredMovies = data.monitoredMovies || [];
             this.isEnabled = data.isEnabled !== false;
             this.sensitivity = data.sensitivity || 'medium';
-
         } catch (err) {
             console.error("Error loading settings", err);
         }
     }
 
-
     async loadAllMovies() {
-    try {
-        const res = await fetch("https://grupo3.jb.dcc.uchile.cl/spoilerBlock/api/movies");
-        const movies = await res.json();
-
-        this.allMovies = Array.isArray(movies) ? movies : [];
-        this.updateMovieSelector();
-    } catch (err) {
-        console.error("Error al cargar películas:", err);
-        this.allMovies = ["Coraline", "Avengers", "Totoro"];
-        this.updateMovieSelector();
+        try {
+            const res = await fetch("https://grupo3.jb.dcc.uchile.cl/spoilerBlock/api/movies");
+            const movies = await res.json();
+            this.allMovies = Array.isArray(movies) ? movies : [];
+            this.updateMovieSelector();
+        } catch (err) {
+            console.error("Error al cargar películas:", err);
+            this.allMovies = [
+                { title: "Coraline", description: "Coraline plot..." },
+                { title: "Avengers", description: "Avengers plot..." },
+                { title: "Totoro", description: "Totoro plot..." }
+            ];
+            this.updateMovieSelector();
+        }
     }
-}
 
     async saveSettings() {
         try {
@@ -63,7 +62,6 @@ class SpoilerBlockPopup {
                     });
                 }
             });
-
         } catch (error) {
             console.error("Error saving settings:", error);
         }
@@ -82,27 +80,26 @@ class SpoilerBlockPopup {
         });
 
         document.getElementById("addMovieBtn").addEventListener("click", () => {
-            const movie = document.getElementById("movieSelector").value;
+            const movieTitle = document.getElementById("movieSelector").value;
+            const movieObj = this.allMovies.find(m => m.title === movieTitle);
 
-            if (!this.monitoredMovies.includes(movie)) {
-                this.monitoredMovies.push(movie);
+            if (!this.monitoredMovies.some(m => m.title === movieTitle)) {
+                this.monitoredMovies.push(movieObj);
                 this.updateMovieList();
                 this.saveSettings();
-                this.updateStatus(`Added "${movie}"`);
+                this.updateStatus(`Added "${movieObj.title}"`);
             } else {
                 this.updateStatus("Already added");
             }
         });
     }
 
-
     updateMovieSelector() {
         const selector = document.getElementById("movieSelector");
         selector.innerHTML = this.allMovies
-            .map(m => `<option value="${m}">${m}</option>`)
+            .map(m => `<option value="${m.title}">${m.title}</option>`)
             .join("");
     }
-
 
     updateMovieList() {
         const list = document.getElementById("movieList");
@@ -116,24 +113,25 @@ class SpoilerBlockPopup {
 
         list.innerHTML = this.monitoredMovies.map(m => `
             <div class="movie-item">
-                <span>${m}</span>
-                <button class="remove-btn" data-movie="${m}">Remove</button>
+                <span class="movie-title" title="${m.description}">${m.title}</span>
+                <button class="remove-btn" data-title="${m.title}">Remove</button>
             </div>
         `).join("");
 
+        // Event listeners para los botones
         list.querySelectorAll(".remove-btn").forEach(btn => {
             btn.addEventListener("click", () => {
-                const movie = btn.getAttribute("data-movie");
-                this.removeMovie(movie);
+                const title = btn.getAttribute("data-title");
+                this.removeMovie(title);
             });
         });
     }
-    
-    removeMovie(movie) {
-        this.monitoredMovies = this.monitoredMovies.filter(m => m !== movie);
+
+    removeMovie(title) {
+        this.monitoredMovies = this.monitoredMovies.filter(m => m.title !== title);
         this.updateMovieList();
         this.saveSettings();
-        this.updateStatus(`Removed "${movie}"`);
+        this.updateStatus(`Removed "${title}"`);
     }
 
     updateUI() {

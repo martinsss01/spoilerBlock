@@ -125,6 +125,39 @@ body {
     border-bottom: none;
 }
 
+/* Tooltip contenedor */
+.movie-title {
+    position: relative;
+    cursor: pointer;
+}
+
+/* Tooltip con la descripción */
+.movie-title::after {
+    content: attr(data-desc);
+    position: absolute;
+    top: 50%;
+    left: -320px; /* hacia la izquierda */
+    transform: translateY(-50%);
+    width: 300px;
+    padding: 10px;
+    background: #243b6b;
+    color: white;
+    font-size: 12px;
+    border-radius: 6px;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.2s;
+    white-space: normal;
+    z-index: 10;
+}
+
+/* Mostrar tooltip al hover */
+.movie-title:hover::after {
+    opacity: 1;
+}
+
+
 /* Buttons */
 .remove-btn {
     background: #cc3b3b;
