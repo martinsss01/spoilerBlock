@@ -30,20 +30,18 @@ class SpoilerBlockPopup {
 
 
     async loadAllMovies() {
-        try {
-            // const res = await fetch("http://ip_por_hacer/movies");
-            // const json = await res.json();
-            // this.allMovies = json.movies;
+    try {
+        const res = await fetch("https://grupo3.jb.dcc.uchile.cl/spoilerBlock/api/movies");
+        const movies = await res.json();
 
-            // Lista fija temporal
-            this.allMovies = ["Coraline", "Avengers", "Totoro"];
-
-            this.updateMovieSelector();
-
-        } catch (err) {
-            console.error("Error al cargar películas:", err);
-        }
+        this.allMovies = Array.isArray(movies) ? movies : [];
+        this.updateMovieSelector();
+    } catch (err) {
+        console.error("Error al cargar películas:", err);
+        this.allMovies = ["Coraline", "Avengers", "Totoro"];
+        this.updateMovieSelector();
     }
+}
 
     async saveSettings() {
         try {
@@ -130,7 +128,7 @@ class SpoilerBlockPopup {
             });
         });
     }
-
+    
     removeMovie(movie) {
         this.monitoredMovies = this.monitoredMovies.filter(m => m !== movie);
         this.updateMovieList();
@@ -165,4 +163,23 @@ class SpoilerBlockPopup {
 let popup;
 document.addEventListener("DOMContentLoaded", () => {
     popup = new SpoilerBlockPopup();
+});
+
+document.getElementById("checkSpoilerBtn").addEventListener("click", async () => {
+    const reviewText = document.getElementById("reviewText").value;
+    if (!reviewText) return;
+
+    try {
+        const res = await fetch("https://grupo3.jb.dcc.uchile.cl/spoilerBlock/api/predict", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ text: reviewText })
+        });
+
+        const data = await res.json();
+        document.getElementById("spoilerResult").textContent = data.result || data.error;
+    } catch (err) {
+        console.error(err);
+        document.getElementById("spoilerResult").textContent = "Error al consultar el backend";
+    }
 });
