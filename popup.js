@@ -83,8 +83,8 @@ class SpoilerBlockPopup {
             const movieTitle = document.getElementById("movieSelector").value;
             const movieObj = this.allMovies.find(m => m.title === movieTitle);
 
-            if (!this.monitoredMovies.some(m => m.title === movieTitle)) {
-                this.monitoredMovies.push(movieObj);
+            if (!this.monitoredMovies.some(m => m.movie_id === movieObj.movie_id)) {
+                this.monitoredMovies.push(movieObj);  
                 this.updateMovieList();
                 this.saveSettings();
                 this.updateStatus(`Added "${movieObj.title}"`);
@@ -92,6 +92,7 @@ class SpoilerBlockPopup {
                 this.updateStatus("Already added");
             }
         });
+
     }
 
     updateMovieSelector() {
@@ -167,17 +168,57 @@ document.getElementById("checkSpoilerBtn").addEventListener("click", async () =>
     const reviewText = document.getElementById("reviewText").value;
     if (!reviewText) return;
 
+    const movieIds = popup.monitoredMovies.map(m => m.movie_id); // asumimos que movie_id existe
+
+    if (movieIds.length === 0) {
+        document.getElementById("spoilerResult").textContent = "No movies selected";
+        return;
+    }
+
     try {
-        const res = await fetch("https://grupo3.jb.dcc.uchile.cl/spoilerBlock/api/predict", {
+        const res = await fetch("https://grupo3.jb.dcc.uchile.cl/spoilerBlock/api/match_movies", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ text: reviewText })
+            body: JSON.stringify({ text: reviewText, movie_ids: movieIds })
         });
 
         const data = await res.json();
-        document.getElementById("spoilerResult").textContent = data.result || data.error;
+
+        if (!Array.isArray(data)) {
+            document.getElementById("spoilerResult").textContent = "Error: backend no respondió correctamente";
+            return;
+        }
+
+        let threshold;
+        switch (popup.sensitivity) {
+            case 'low': threshold = 0.5; break;
+            case 'medium': threshold = 0.65; break;
+            case 'high': threshold = 0.8; break;
+            default: threshold = 0.65;
+        }
+
+        let resultText = "";
+        let isSpoiler = false;
+
+        data.forEach(d => {
+            const movie = popup.monitoredMovies.find(m => m.movie_id === d.movie_id);
+            const title = movie ? movie.title : d.movie_id; 
+            const similarity = d.similarity != null ? d.similarity.toFixed(3) : "N/A";
+
+            resultText += `🎬 ${title} — Similarity: ${similarity}\n`;
+
+            if (d.similarity >= threshold) {
+                isSpoiler = true;
+            }
+        });
+
+
+        resultText += `\n⚠ Spoiler detected: ${isSpoiler ? "YES" : "NO"}`;
+        document.getElementById("spoilerResult").textContent = resultText;
+
     } catch (err) {
         console.error(err);
         document.getElementById("spoilerResult").textContent = "Error al consultar el backend";
     }
 });
+
