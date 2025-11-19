@@ -162,6 +162,66 @@ class SpoilerBlockPopup {
 let popup;
 document.addEventListener("DOMContentLoaded", () => {
     popup = new SpoilerBlockPopup();
+
+    // ----------------------
+    //  MASSIVE LIST PROCESSOR
+    // ----------------------
+
+    document.getElementById("processBtn").addEventListener("click", async () => {
+        const inputText = document.getElementById("inputText").value.trim();
+        if (!inputText) return;
+
+        const lines = inputText.split("\n").map(l => l.trim()).filter(l => l !== "");
+        const movieIds = popup.monitoredMovies.map(m => m.movie_id);
+
+        if (movieIds.length === 0) {
+            document.getElementById("outputText").value = "No movies selected.";
+            return;
+        }
+
+        let output = "";
+
+        for (let line of lines) {
+            try {
+                const res = await fetch("https://grupo3.jb.dcc.uchile.cl/spoilerBlock/api/match_movies", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ text: line, movie_ids: movieIds })
+                });
+
+                const data = await res.json();
+
+                if (!Array.isArray(data)) {
+                    output += `${line}\tERROR\n`;
+                    continue;
+                }
+
+                // pick highest similarity
+                let best = data.reduce((max, item) =>
+                    item.similarity > max.similarity ? item : max,
+                    data[0]
+                );
+
+                output += `${line}\t${best.similarity.toFixed(3)}\n`;
+
+            } catch (err) {
+                console.error(err);
+                output += `${line}\tERROR\n`;
+            }
+        }
+
+        document.getElementById("outputText").value = output;
+    });
+
+    // ----------------------
+    //  COPY BUTTON
+    // ----------------------
+
+    document.getElementById("copyBtn").addEventListener("click", () => {
+        const output = document.getElementById("outputText").value;
+        navigator.clipboard.writeText(output);
+    });
+
 });
 document.getElementById("checkSpoilerBtn").addEventListener("click", async () => {
     const reviewText = document.getElementById("reviewText").value;
