@@ -163,7 +163,6 @@ let popup;
 document.addEventListener("DOMContentLoaded", () => {
     popup = new SpoilerBlockPopup();
 });
-
 document.getElementById("checkSpoilerBtn").addEventListener("click", async () => {
     const reviewText = document.getElementById("reviewText").value;
     if (!reviewText) return;
@@ -191,10 +190,10 @@ document.getElementById("checkSpoilerBtn").addEventListener("click", async () =>
 
         let threshold;
         switch (popup.sensitivity) {
-            case 'low': threshold = 0.5; break;
-            case 'medium': threshold = 0.65; break;
-            case 'high': threshold = 0.8; break;
-            default: threshold = 0.65;
+            case 'low': threshold = 0.4; break;
+            case 'medium': threshold = 0.55; break;
+            case 'high': threshold = 0.7; break;
+            default: threshold = 0.55;
         }
 
         let resultText = "";
@@ -220,5 +219,7 @@ document.getElementById("checkSpoilerBtn").addEventListener("click", async () =>
         console.error(err);
         document.getElementById("spoilerResult").textContent = "Error al consultar el backend";
     }
+
+    
 });
 
