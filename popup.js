@@ -168,7 +168,7 @@ document.getElementById("checkSpoilerBtn").addEventListener("click", async () =>
     const reviewText = document.getElementById("reviewText").value;
     if (!reviewText) return;
 
-    const movieIds = popup.monitoredMovies.map(m => m.movie_id); // asumimos que movie_id existe
+    const movieIds = popup.monitoredMovies.map(m => m.movie_id);
 
     if (movieIds.length === 0) {
         document.getElementById("spoilerResult").textContent = "No movies selected";
