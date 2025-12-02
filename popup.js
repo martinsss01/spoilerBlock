@@ -158,6 +158,44 @@ class SpoilerBlockPopup {
     }
 }
 
+document.getElementById("checkOpenAIOnlyBtn").addEventListener("click", async () => {
+    const reviewText = document.getElementById("reviewTextOpenAI").value;
+    if (!reviewText) {
+        document.getElementById("spoilerResult").textContent = "Debes escribir un texto";
+        return;
+    }
+
+    // Lista de películas monitoreadas (solo títulos)
+    const titlesOnly = popup.monitoredMovies.map(m => m.title);
+
+    if (titlesOnly.length === 0) {
+        document.getElementById("spoilerResult").textContent = "No movies selected";
+        return;
+    }
+
+    try {
+        const res = await fetch("https://grupo3.jb.dcc.uchile.cl/spoilerBlock/api/predict_openai", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+                text: reviewText,
+                movies: titlesOnly
+            })
+        });
+
+        const textResponse = await res.text();
+
+        // Ejemplo esperado: "True {/ Coraline"
+        document.getElementById("spoilerResult").textContent =
+            `🧠 OpenAI Test Directo → ${textResponse}`;
+
+    } catch (err) {
+        console.error(err);
+        document.getElementById("spoilerResult").textContent =
+            "Error al consultar OpenAI";
+    }
+});
+
 
 let popup;
 document.addEventListener("DOMContentLoaded", () => {
