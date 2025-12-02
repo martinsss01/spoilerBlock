@@ -211,10 +211,39 @@ document.getElementById("checkSpoilerBtn").addEventListener("click", async () =>
             }
         });
 
+        if (!isSpoiler) {
+            resultText += `\n⚠ Spoiler detected: NO`;
+            document.getElementById("spoilerResult").textContent = resultText;
+            return;
+        }
 
-        resultText += `\n⚠ Spoiler detected: ${isSpoiler ? "YES" : "NO"}`;
-        document.getElementById("spoilerResult").textContent = resultText;
+        // ===============
+        // PASO 2: OpenAI detecta DE QUÉ PELÍCULA ES
+        // ===============
+        try {
+            const titlesOnly = popup.monitoredMovies.map(m => m.title);
 
+            const openaiRes = await fetch("https://grupo3.jb.dcc.uchile.cl/spoilerBlock/api/predict_openai", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                    text: reviewText,
+                    movies: titlesOnly
+                })
+            });
+
+            const openaiText = await openaiRes.text();  
+            // Ej: "True {/ Coraline"
+
+            resultText += `\n🧠 OpenAI Match: ${openaiText}`;
+
+            document.getElementById("spoilerResult").textContent = resultText;
+
+        } catch (err) {
+            console.error(err);
+            resultText += "\n(OpenAI error)";
+            document.getElementById("spoilerResult").textContent = resultText;
+        }
     } catch (err) {
         console.error(err);
         document.getElementById("spoilerResult").textContent = "Error al consultar el backend";
