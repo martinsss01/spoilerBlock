@@ -89,8 +89,10 @@ async function checkForSpoiler(span, text, movieIds) {
         const isSpoiler = data.some(d => d.similarity >= threshold);
 
         if (isSpoiler) {
+            //ACA _HACER 2 do check true -> marcar ; False -> No marcar
             console.warn("🚫 SPOILER DETECTADO:", text);
             hideSpoilerComment(span);
+
         } else {
             console.log("✅ No es spoiler:", text);
         }
