@@ -228,10 +228,10 @@ document.getElementById("checkSpoilerBtn").addEventListener("click", async () =>
 
         let threshold;
         switch (popup.sensitivity) {
-            case 'low': threshold = 0.4; break;
-            case 'medium': threshold = 0.55; break;
-            case 'high': threshold = 0.7; break;
-            default: threshold = 0.55;
+            case 'low': threshold = 0.2; break;
+            case 'medium': threshold = 0.35; break;
+            case 'high': threshold = 0.5; break;
+            default: threshold = 0.35;
         }
 
         let resultText = "";

@@ -81,9 +81,9 @@ async function checkForSpoiler(span, text, movieIds) {
 
         console.log("📩 [API RESPONSE]", data);
 
-        let threshold = 0.65;
-        if (cachedSettings.sensitivity === "low") threshold = 0.5;
-        if (cachedSettings.sensitivity === "high") threshold = 0.8;
+        let threshold = 0.35;
+        if (cachedSettings.sensitivity === "low") threshold = 0.2;
+        if (cachedSettings.sensitivity === "high") threshold = 0.5;
 
         const check1_similarity = data.some(d => d.similarity >= threshold);
 
