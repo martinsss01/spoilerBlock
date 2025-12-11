@@ -66,6 +66,11 @@ async function checkForSpoiler(span, text, movieIds) {
     console.log("📤 [API REQUEST] Enviando texto al backend:", text);
 
     try {
+        //
+        // =====================================================
+        // 1) CHECK 1: SIMILARITY
+        // =====================================================
+        //
         const res = await fetch("https://grupo3.jb.dcc.uchile.cl/spoilerBlock/api/match_movies", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
@@ -80,27 +85,70 @@ async function checkForSpoiler(span, text, movieIds) {
         if (cachedSettings.sensitivity === "low") threshold = 0.5;
         if (cachedSettings.sensitivity === "high") threshold = 0.8;
 
-        const similarities = data.map(
-            d => `${d.movie_id}: ${d.similarity?.toFixed(3)}`
-        );
+        const check1_similarity = data.some(d => d.similarity >= threshold);
 
-        console.log("📊 [SIMILARITY CHECK]", similarities, "threshold =", threshold);
+        console.log("📊 [SIM CHECK RESULT] =", check1_similarity);
 
-        const isSpoiler = data.some(d => d.similarity >= threshold);
+        //
+        // 🚫 Si falla el primer check, se termina aquí
+        //
+        if (!check1_similarity) {
+            console.log("❇️ El primer check falló — NO se consulta OpenAI");
+            console.log("✅ No es spoiler:", text);
+            return;
+        }
 
-        if (isSpoiler) {
-            //ACA _HACER 2 do check true -> marcar ; False -> No marcar
+        //
+        // =====================================================
+        // 2) CHECK 2: OPENAI MATCH (solo si pasó check 1)
+        // =====================================================
+        //
+        let check2_openai = false;
+
+        try {
+            const titlesOnly = cachedSettings.monitoredMovies.map(m => m.title);
+
+            const openaiRes = await fetch("https://grupo3.jb.dcc.uchile.cl/spoilerBlock/api/predict_openai", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                    text,
+                    movies: titlesOnly
+                })
+            });
+
+            const openaiText = await openaiRes.text();
+            console.log("🧠 [OPENAI RAW RESPONSE]", openaiText);
+
+            check2_openai = openaiText.trim().toLowerCase().startsWith("true");
+
+            console.log("🧠 [OPENAI MATCH RESULT] =", check2_openai);
+
+        } catch (e) {
+            console.error("❌ Error en segundo check (OpenAI)", e);
+        }
+
+        //
+        // =====================================================
+        // DECISIÓN FINAL
+        // =====================================================
+        //
+        const finalDecision = check2_openai;  // check1 ya es TRUE
+
+        console.log("🏁 [FINAL DECISION] =>", finalDecision);
+
+        if (finalDecision) {
             console.warn("🚫 SPOILER DETECTADO:", text);
             hideSpoilerComment(span);
-
         } else {
-            console.log("✅ No es spoiler:", text);
+            console.log("✅ No es spoiler (OpenAI dijo False):", text);
         }
 
     } catch (err) {
         console.error("❌ Error en API:", err);
     }
 }
+
 
 function hideSpoilerComment(span) {
     console.log("🟥 Ocultando comentario:", span.innerText);
